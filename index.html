@@ -69,7 +69,6 @@
 
   <script>
     const LAMPORTS = 1000000000;
-    const API_HOST = ["api-mainnet", "magiceden", "dev"].join(".");
 
     function quickPick(slug) {
       document.getElementById("symbolInput").value = slug;
@@ -81,11 +80,10 @@
       const tbody = document.getElementById("resultsBody");
       if (!symbol) return;
 
-      tbody.innerHTML = `<tr><td colspan="4">Fetching stats for ${symbol}...</td></tr>`;
-      const endpoint = `https://${API_HOST}/v2/collections/${encodeURIComponent(symbol)}/stats`;
+      tbody.innerHTML = `<tr><td colspan="4">Fetching live stats for ${symbol}...</td></tr>`;
 
       try {
-        const res = await fetch(endpoint);
+        const res = await fetch(`/api/stats?symbol=${encodeURIComponent(symbol)}`);
         if (!res.ok) throw new Error("Collection not found");
         const data = await res.json();
         const floor = data.floorPrice ? (data.floorPrice / LAMPORTS).toFixed(2) : "N/A";
@@ -99,7 +97,7 @@
             <td>${vol} SOL</td>
           </tr>`;
       } catch (err) {
-        tbody.innerHTML = `<tr><td colspan="4">Live API blocked by browser CORS or invalid slug. Try checking the slug or using a CORS proxy.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="4">Could not load collection stats. Verify the slug and try again.</td></tr>`;
       }
     }
 
